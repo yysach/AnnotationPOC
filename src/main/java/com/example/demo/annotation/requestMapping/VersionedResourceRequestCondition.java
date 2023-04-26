@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.servlet.mvc.condition.AbstractRequestCondition;
 
+import com.example.demo.exception.BadRequestException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -50,7 +51,7 @@ public class VersionedResourceRequestCondition extends AbstractRequestCondition<
 		}
 		
     	if(configIdFromRequestBody >= this.fromVersion) return this;
-        return null;
+    	return null;
     }
 
     @Override
