@@ -102,14 +102,7 @@ public class VersionedResourceRequestCondition extends AbstractRequestCondition<
 		try {
 			reader = request.getReader();
 			mapper = new ObjectMapper();
-			StringBuilder builder = new StringBuilder();
-			int characterInteger = 0;
-			while((characterInteger = reader.read()) != -1) {
-				char character = (char) characterInteger;
-				builder.append(character);
-			}
-			
-			JsonNode node = mapper.readTree(builder.toString());
+			JsonNode node = mapper.readTree(reader);
 			System.out.println("Read RequestBody : " + node.toPrettyString());
 			return Integer.valueOf(node.get("configId").asText());
 		} catch (Exception e) {
