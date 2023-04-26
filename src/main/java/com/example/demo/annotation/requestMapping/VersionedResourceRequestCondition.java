@@ -4,12 +4,16 @@
 
 package com.example.demo.annotation.requestMapping;
 
+import java.io.BufferedReader;
 import java.util.Collection;
 import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.servlet.mvc.condition.AbstractRequestCondition;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class VersionedResourceRequestCondition extends AbstractRequestCondition<VersionedResourceRequestCondition> {
 
@@ -31,14 +35,21 @@ public class VersionedResourceRequestCondition extends AbstractRequestCondition<
 
     @Override
     public VersionedResourceRequestCondition getMatchingCondition(HttpServletRequest request) {
-    	System.out.println("inside getMatchingCondition");
-    	Integer headerFrom = Integer.parseInt(request.getHeader("configId"));
-    	System.out.println("Request Parameter : " + request.getParameter("configId"));
-    	System.out.println("received fromVersion from header is : " + headerFrom);
+    	// header, requestParam and requestBody all three able to get here...
+    	System.out.println("-------inside getMatchingCondition---------");
+    	Integer configIdFromHeader = Integer.parseInt(request.getHeader("configId"));
+    	Integer configIdFromParam = Integer.parseInt(request.getParameter("configId"));
+    	Integer configIdFromRequestBody = readFromHttpServletRequest(request);
+    	
+    	System.out.println("fromVersion received from RequestBody : " + configIdFromRequestBody);
     	System.out.println("fromVersion set at annotation condition is  : " + this.fromVersion);
-    	if(headerFrom >= this.fromVersion) {
-    		return this;
-    	}
+    	
+		if (configIdFromRequestBody == null) {
+			System.out.println("configIdNotFoundException");
+			return null;
+		}
+		
+    	if(configIdFromRequestBody >= this.fromVersion) return this;
         return null;
     }
 
@@ -62,7 +73,6 @@ public class VersionedResourceRequestCondition extends AbstractRequestCondition<
         /*
          * Return the discrete items a request condition is composed of.
          */
-    	System.out.println("from getContent " + fromVersion);
         return (fromVersion == null) ? Collections.emptyList() : Collections.singletonList(fromVersion);
     }
 
@@ -85,4 +95,26 @@ public class VersionedResourceRequestCondition extends AbstractRequestCondition<
          */
         return " || ";
     }
+    
+	private Integer readFromHttpServletRequest(HttpServletRequest request) {
+		BufferedReader reader = null;
+		ObjectMapper mapper = null;
+		try {
+			reader = request.getReader();
+			mapper = new ObjectMapper();
+			StringBuilder builder = new StringBuilder();
+			int characterInteger = 0;
+			while((characterInteger = reader.read()) != -1) {
+				char character = (char) characterInteger;
+				builder.append(character);
+			}
+			
+			JsonNode node = mapper.readTree(builder.toString());
+			System.out.println("Read RequestBody : " + node.toPrettyString());
+			return Integer.valueOf(node.get("configId").asText());
+		} catch (Exception e) {
+			System.out.println("Got exception while reading HttpServletRequest reader" + e);
+		}
+		return null;
+	}
 }

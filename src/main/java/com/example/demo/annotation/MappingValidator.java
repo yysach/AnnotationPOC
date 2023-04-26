@@ -24,20 +24,21 @@ public class MappingValidator implements ConstraintValidator<VersionedResource, 
 	public boolean isValid(Object obj, ConstraintValidatorContext context) {
 		// header, requestParam and requestBody all three able to get here...
 		System.out.println("-----------Inside validator------------");
-		System.out.println(request.getParameter("configId"));
-		System.out.println(request.getHeader("configId"));
 		System.out.println(obj.getClass().getSimpleName());
-		Integer configId = RequestDtoFactory.getInstance(obj.getClass().getSimpleName(), obj);
-
-		if (configId == null) {
+		
+    	Integer configIdFromHeader = Integer.parseInt(request.getHeader("configId"));
+    	Integer configIdFromParam = Integer.parseInt(request.getParameter("configId"));
+		Integer configIdFromRequestBody = RequestDtoFactory.getInstance(obj.getClass().getSimpleName(), obj);
+		
+    	System.out.println("fromVersion received from RequestBody : " + configIdFromRequestBody);
+    	System.out.println("fromVersion set at annotation is  : " + this.from);
+    	
+		if (configIdFromRequestBody == null) {
 			System.out.println("configIdNotFoundException");
 			return false;
 		}
 
-
-		System.out.println("checking validation for configId " + configId);
-		if(configId >= this.from) return true;
+		if(configIdFromRequestBody >= this.from) return true;
 		return false;
 	}
-	
 }

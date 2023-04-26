@@ -12,5 +12,5 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Version {
 
-	int from();
+	int from() default 3;
 }
