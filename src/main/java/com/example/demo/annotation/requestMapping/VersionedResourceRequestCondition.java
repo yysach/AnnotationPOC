@@ -10,16 +10,18 @@ import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.web.servlet.mvc.condition.AbstractRequestCondition;
 
-import com.example.demo.exception.BadRequestException;
+import com.example.demo.helper.VersionDao;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 public class VersionedResourceRequestCondition extends AbstractRequestCondition<VersionedResourceRequestCondition> {
 
     private Integer fromVersion;
-
+    
     public VersionedResourceRequestCondition(int from) {
     	this.fromVersion = from;
     }
@@ -41,9 +43,16 @@ public class VersionedResourceRequestCondition extends AbstractRequestCondition<
     	Integer configIdFromHeader = Integer.parseInt(request.getHeader("configId"));
     	Integer configIdFromParam = Integer.parseInt(request.getParameter("configId"));
     	Integer configIdFromRequestBody = readFromHttpServletRequest(request);
-    	
+
     	System.out.println("fromVersion received from RequestBody : " + configIdFromRequestBody);
     	System.out.println("fromVersion set at annotation condition is  : " + this.fromVersion);
+    	AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+    	context.scan("com.example.demo.helper");
+    	context.refresh();
+    			
+    	//Getting Bean by Class
+    	VersionDao repository = context.getBean(VersionDao.class);
+    	System.out.println("Version : " + repository.getVersion());
     	
 		if (configIdFromRequestBody == null) {
 			System.out.println("configIdNotFoundException");

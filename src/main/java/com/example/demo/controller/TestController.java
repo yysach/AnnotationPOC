@@ -3,12 +3,14 @@ package com.example.demo.controller;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.annotation.requestMapping.Version;
+import com.example.demo.helper.IVersionRepository;
 import com.example.demo.model.AnotheHostDto;
 import com.example.demo.model.ExtendedHostDetail;
 import com.example.demo.model.HostDetail;
@@ -18,6 +20,8 @@ import com.example.demo.model.HostDetailMethod;
 @RestController
 public class TestController {
 
+	@Autowired
+	private IVersionRepository repository;
 	/*
 	 * Using VersionMappingValidator
 	 */
@@ -73,6 +77,7 @@ public class TestController {
 		 * will only able to get here
 		 * if sent configId in requestDto is greater than or equals to mentioned at @Version
 		 */
+		System.out.println(repository.getVersion());
 		System.out.println("HostDetails from requestMapping : " + hostDetail);
 		return "this is the home requestMapping page";
 	}
