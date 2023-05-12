@@ -1,7 +1,3 @@
-/*
- * $Copyright: Copyright (c) 2017 Veritas Technologies LLC. All rights reserved VT25-0977-2658-84-51-3 $
- */
-
 package com.example.demo.annotation.requestMapping;
 
 import java.io.BufferedReader;
